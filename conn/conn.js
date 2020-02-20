@@ -7,25 +7,17 @@ const mysqlConn =mysql.createConnection({
   host:'localhost',
   user:'root',
   password:'',
-  database:'mydata'
+  database:'rms_db'
 
-});
+})
 
 
-mysqlConn.connect((err)  =>{
+mysqlConn.connect((err)=>{
 
 if(!err)
-
-console.log('db connection succeed');
-
-
+    console.log('db connection succeed');
 else
-
-
-console.log('db connection failed');
-
-
+    console.log('db connection failed');
 });
-
 
 module.exports =mysqlConn;

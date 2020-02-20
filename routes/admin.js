@@ -1,85 +1,65 @@
-const express = require('express');
-const router = express.Router();
 const mysql = require('mysql');
-const  db = require('../conn/conn');
-const bodyparser = require('body-parser')
+const express = require('express');
+const app = express();
+const con= require('../conn/conn');
+const router = express.Router();
 
-//Get all student
-router.get('/reg',(req,res)=>{
-    db.query('SELECT * FROM admin',(err,rows,fields)=>{
-        if(!err)
-            res.send(rows);
-        else
-            console.log(err);
-    })
-    
-});
 
-//Get a student
-router.get('/reg/:id',(req,res)=>{
-    db.query('SELECT * FROM admin WHERE id = ?',[req.params.id],(err,rows,fields)=>{
-        if(!err)
-            res.send(rows);
-        else
-            console.log(err);
-    })
-    
-});
 
-//Delete a student
-router.delete('/reg/:id',(req,res)=>{
-    db.query('DELETE FROM admin WHERE id = ?',[req.params.id],(err,rows,fields)=>{
-        if(!err)
-            res.send('Deleted successfully');
-        else
-            console.log(err);
-    })
-    
-});
-//Delete a seller
-router.delete('/delete/:id',(req,res)=>{
-    db.query('DELETE FROM admin WHERE id = ?',[req.params.id],(err,rows,fields)=>{
-        if(!err)
-            res.send('Deleted successfully');
-        else
-            console.log(err);
-    })
-    
-});
-//Insert a Admin
-/*router.post('/reg',(req,res)=>{
+router.post('/reg', function(req, res){  
 
-    let adm = req.body;
-    var sql =  "SET @id = ?;SET @First_name = ?;SET @Last_name = ?;SET @email = ?;SET @passwrd = ?;\
-    CALL A(@id,@First_name,@Last_name,@email,@passwrd);";
+    let adminData = {
+        id:req.body.id,
+        fname:req.body.fname,
+        lname:req.body.lname,
+        email:req.body.email,
+        pwd:req.body.pwd
+    };
 
-    db.query(sql,[adm.id,adm.First_name,adm.Last_name,adm.email,adm.passwrd],(err,rows,fields)=>{
-        if(!err)
-            rows.forEach(element => {
-                if(element.constructor ==Array)
-                res.send('Inserted student id:'+element[0].adminId);
-            });
-        else
-            console.log(err);
+
+    let email = req.body.email;
+    let myQuery1 = "SELECT * FROM admin WHERE email = ?";
+    con.query(myQuery1,[email],function(err,results){
+        
+        if(results.length > 0){
+
+            res.send({
+                data : results,
+                code : 200,
+                message : "Sorry, the email is alrady registered!"
+
+            })
+
+        }else{
+                let myQuery = "INSERT INTO admin SET ?";
+                con.query(myQuery, [adminData], function(err, results){
+                    if(err){
+                        
+                        res.send({
+                            data : err,
+                            code : 400,
+                            message : "The was an error !!!"
+                        });
+                            
+                    }else{
+                        
+                        console.log("results")
+                        res.send({
+                            data : results,
+                            code : 200,
+                            message : "Registered Successfully..."
+            
+                        })
+                    }
+            })
+        }
+        
     })
-    
 });
 
 
-//Udate a student
-router.put('/reg',(req,res)=>{
 
-    let adm = req.body;
-    var sql = "SET @id = ?;SET @First_name = ?;SET @Last_name = ?;SET @email = ?;SET @passwrd = ?;\
-    CALL A(@id,@First_name,@Last_name,@email,@passwrd);";
 
-    db.query(sql,[adm.id,adm.First_name,adm.Last_name,adm.email,adm.passwrd],(err,rows,fields)=>{
-        if(!err)
-           res.send('Updated...');
-        else
-            console.log(err);
-    })
-    
-});
-*/
-module.exports = router ;
+
+
+module.exports = router;

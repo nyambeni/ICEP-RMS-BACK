@@ -1,5 +1,7 @@
 const express = require('express');
-const router = express.Router();
+router = express.Router();
+con = require('../conn/conn');
 
 
-module.exports = router ;
+
+module.exports = router;
