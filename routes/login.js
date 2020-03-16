@@ -7,7 +7,7 @@ const path = require('path');
 
 const storage = multer.diskStorage({
     destination: function(req,file,cb){
-        cb(null, './upload');
+        cb(null, "./upload");
     },
             filename: function(req,file,cb){
             cb(null,file.originalname);
@@ -27,48 +27,54 @@ const upload = multer({storage:storage});
 		var sql = "SELECT * FROM landlord WHERE email = ? AND pwd = ?";
 			con.query(sql, [email, pwd], function(error, results, fields) {
 				
-				if(error) throw error
+				if (results.length>0) {
+					res.send(results)
+					//  req.session.sesEmail = email;
+					// 	console.log(req.session.sesEmail);
+				}
 				else{
-					res.send("successfully logged");
-                     
-					  }
+					res.send(results)
+						console.log(results)
+				}
 					
 				   })
 							   
 					
 				})
-
-
-				// router.get('/stulogin', function(req, res) {
+				//
+				router.post('/studentlogin', function(req, res) {
 	
-				// 	var email = req.body.email;
-				// 	var pwd = req.body.pwd;
+					var email = req.body.email;
+					var password = req.body.password;
 					
-				// 	var sql = "SELECT * FROM `student` WHERE email = '"+ email +"' AND pwd = '"+ pwd +"'";
-				//     //var sql = "SELECT * FROM student WHERE email = ? AND pwd = ?";
-				// 	con.query(sql, [email, pwd], function(error, results, fields) {
+				var sql = "SELECT email, password FROM student WHERE email = ? AND password = ?";
+					con.query(sql, [email, password], function(error, results, fields) {
 						
-				// 		if(error) throw error
-				// 		else{
-				// 			res.send("successfully logged");
-				// 			req.session.userID = email;
-				// 			console.log(req.session.userID);
-				// 			  }
-				
-				// 		})
-				// 	})
+						
+						if (results.length>0) {
+							res.send('logged in')
+						
+						}
+						else{
+							res.send("user not found")
+							 
+						}
+							
+						})
+									   
+							
+						})
 
-				
             //login working with session
 				router.get('/userLogin', function(req, res) {
 	
 					var email = req.body.email;
-					var pwd = req.body.pwd;
+					var password = req.body.password;
 					
-					if (email && pwd) {
-						var sql = "SELECT * FROM `student` WHERE email = '"+ email +"' AND pwd = '"+ pwd +"'";
+					if (email && password) {
+						var sql = "SELECT * FROM `student` WHERE email = '"+ email +"' AND pwd = '"+ password +"'";
 				    
-					con.query(sql, [email, pwd], function(error, results, fields) {
+					con.query(sql, [email, password], function(error, results, fields) {
 					
 						if (results.length>0) {
 							res.send("successfully logged")
@@ -107,7 +113,7 @@ router.post('/logout', function(req,res){
 });
 
 
-router.post('/upload5',upload.single('reg_proof'),(req,res)=>{
+router.post('/uploadupload',upload.single('reg_proof'),(req,res)=>{
     
     reg_proof = req.file.path;
 
@@ -125,76 +131,55 @@ router.post('/upload5',upload.single('reg_proof'),(req,res)=>{
         res.send("PLEASE UPLOAD YOUR DOCUMENT");
     } 
 });
+
 //
-router.post('/ntwano',upload.single('images'),(req,res)=>{
+router.post('/upload5',upload.single('images'),(req,res)=>{
     
     
 	let post={
-	  images:req.file.path,
 	  email:req.body.email,
 	  propery_name:req.body.propery_name,
 	  propery_owner:req.body.propery_owner,
 	  city:req.body.city,
 	  postal_code:req.body.postal_code,
-	  street_address:req.body.street_address
+	  street_address:req.body.street_address,
+	  reg_proof = req.file.path
             }
- 
+    if (images) {
 		var myQuery = "INSERT INTO property SET ?";
                 con.query(myQuery, [post], function(err, results){
-					if (err) {
+				 	if (err) {
 						res.send("property not added");  
 					}
 					else{
-						return res.send(results)
-						
+						return res.send({results,
+						  message: " successful!!! -- property added"})
 					}
 
 				})
-			})
-//
-router.get('/getimage',(req,res)=>{
-   
-
-		  filepath = path.join(__dirname,'./upload')+'/'+req.body.images;
-		  res.sendFile(filepath);
-           
-});
-////
-router.get('/getproperty',(req,res)=>{
-    con.query('SELECT * FROM property',(err,results)=>{
-        if(!err)
-            res.send(results);
-        else
-            console.log(err);
-    })
-    
+        // con.query("INSERT INTO property(images) VALUES ('"+ images + "')", [images], function(err,results){
+        //     if (err) {
+        //         res.send("upload document - failed.........file not received");  
+        //     }
+        //     else{
+        //         return res.send({results,
+        //           message: " successful!!! --file received"})
+        //     }
+        //     }) 
+    } else {
+        res.send("PLEASE UPLOAD YOUR DOCUMENT");
+    } 
 });
 //
-router.post('/addproperty',upload.single('images'),(req,res)=>{
-    
-    images = req.file.filename;
-	let post={
-	  email:req.body.email,
-	  propery_name:req.body.propery_name,
-	  propery_owner:req.body.propery_owner,
-	  city:req.body.city,
-	  postal_code:req.body.postal_code,
-	  street_address:req.body.street_address
-			}
-			var sql = "INSERT INTO property SET ?";
-			con.query(sql, [post], function(err, results){
-				if (err) {
-					res.send("property not added");  
-				}
-				else{
-					return res.send({results,
-					  message: " successful!!! -- property added"})
-				}
 
-			})
-    if (images) {
+
+router.post('/addprofile',upload.single('proof_reg'),(req,res)=>{
+    
+    reg_proof = req.file.path;
 	
-        con.query("INSERT INTO property(images) VALUES ('"+ images + "')", [images], function(err,results){
+    if (reg_proof) {
+	
+        con.query("INSERT INTO resapplication(proof_reg) VALUES ('"+ proof_reg + "')", [proof_reg], function(err,results){
             if (err) {
                 res.send("upload document - failed.........file not received");  
             }
@@ -207,5 +192,7 @@ router.post('/addproperty',upload.single('images'),(req,res)=>{
         res.send("PLEASE UPLOAD YOUR DOCUMENT");
     } 
 });
-/////
+
+//
 module.exports = router ;
+

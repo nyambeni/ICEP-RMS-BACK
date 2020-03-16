@@ -89,7 +89,7 @@ router.get('/getlord/:id',(req,res)=>{
 });
 
 //Delete a student
-router.delete('/gellord/:id',(req,res)=>{
+router.delete('/dellord/:id',(req,res)=>{
     con.query('DELETE FROM landlord WHERE id = ?',[req.params.id],(err,rows,fields)=>{
         if(!err)
             res.send('Deleted successfully');
