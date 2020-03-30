@@ -101,7 +101,7 @@ router.delete('/dellord/:id',(req,res)=>{
 
 //upload docs
 router.post('/upload',upload.single('reg_proof'),(req,res)=>{
-   reg_proof= req.file.path;
+   //reg_proof= req.file.path;
    con.query("INSERT INTO reg(reg_proof) VALUES (?)",[reg_proof],function(err,result){
     if(err) throw err;
     
@@ -115,7 +115,7 @@ router.post('/upload',upload.single('reg_proof'),(req,res)=>{
 //
 
 router.post('/uploadfile', upload.single('reg_proof'), (req, res, next) => {
-    const file = req.file.path;
+    //const file = req.file.path;
     if (!file) {
       const error = new Error('Please upload a file')
       error.httpStatusCode = 400
@@ -128,7 +128,7 @@ router.post('/uploadfile', upload.single('reg_proof'), (req, res, next) => {
 //
 router.post('/upload3',upload.single('reg_proof'),(req,res)=>{
     
-    reg_proof = req.file.path;
+    //reg_proof = req.file.path;
 
     if (reg_proof) {
         con.query("INSERT INTO reg(reg_proof) VALUES ('"+ reg_proof + "')", [reg_proof], function(err,results){
@@ -144,7 +144,138 @@ router.post('/upload3',upload.single('reg_proof'),(req,res)=>{
         res.send("PLEASE UPLOAD YOUR DOCUMENT");
     } 
 });
+
 //
+
+
+
+ //apply for residence
+
+
+ router.post('/resapplication',(req,res)=>{
+     var status = "PENDING";
+    let applyData = {
+        email : req.body.email,
+        prop_email	:req.body.prop_email,
+        status:status
+     };
+        var prop_email = req.body.prop_email;
+        var email = req.body.email;
+    var myQuery1 = "SELECT * FROM resapplication WHERE prop_email=?";
+
+    con.query(myQuery1,[prop_email],function(err,results){
+        
+        if(results.length>0){
+
+            res.send({
+                message : "You have already applied on this property"
+
+            })
+
+        }else{
+                var myQuery = "INSERT INTO resapplication SET ?";
+                con.query(myQuery, [applyData], function(err, results){
+                    if(err) throw err
+                    
+                    else{
+                        res.send({
+                            message : "Application sent..."
+            
+                        })
+                     
+                    }
+            })
+        }
+        
+    })
+});
+ //
+ //decline application
+ router.put('/decline',(req,res)=>{
+    var email = req.body.email;
+    var sql ="UPDATE resapplication SET status ='DECLINED' WHERE email=?"
+    con.query(sql,[email],function(err,results){
+        if(!err)
+            res.send('Application Declined');
+        else
+            console.log(err);
+    })
+ })
+
+ //accept application
+
+ router.put('/accept',(req,res)=>{
+    var email = req.body.email;
+    var prop_email = req.body.prop_email;
+    var sql ="UPDATE resapplication SET status ='ACCEPTED' WHERE email=?"
+    con.query(sql,[email],function(err,results){
+        if(err){
+            res.send('something went wrong');
+        }else{
+            var sql1= "UPDATE property set avail_rooms=avail_rooms-1 WHERE prop_email=?";
+            con.query(sql1,[prop_email],function(err,results){
+              if(err)throw err;
+              else{
+                  res.send('Room activated');
+              }
+
+            })
+                
+        }
+    })
+ })
+
+//add property
+router.post('/addproperty',(req,res)=>{
+    let propData = {
+      prop_email : req.body.prop_email,
+      property_name:req.body.property_name,
+      property_owner:req.body.property_owner,
+      city:req.body.city,
+      postal_code:req.body.postal_code,
+      street_address:req.body.street_address,
+      num_rooms:req.body.num_rooms,
+      avail_rooms:req.body.num_rooms   
+    }; 
+    //var email = req.body.email;
+    var prop_email = req.body.prop_email;
+    var myQuery1 = "SELECT * FROM property WHERE prop_email = ?";
+    con.query(myQuery1,[prop_email],function(err,results){
+        
+        if(results.length > 0){
+
+            res.send({
+            
+                message : "Sorry, this property is already registered[tip: check email address]"
+
+            })
+
+        }else{
+                var myQuery = "INSERT INTO property SET ?";
+                con.query(myQuery, [propData], function(err, results){
+                    if(err)throw err
+                    else{
+                        res.send({
+
+                            message : "Application sent"
+            
+                        })
+                    }
+            })
+        }
+        
+    })
+});
+
+///view applications by gender
+
+router.get('/getgender',(req,res)=>{
+
+    var sql ="SELECT * FROM students"
+
+
+})
+
 module.exports = router;
 
 

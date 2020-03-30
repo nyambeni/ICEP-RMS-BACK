@@ -143,7 +143,7 @@ router.post('/upload5',upload.single('images'),(req,res)=>{
 	  city:req.body.city,
 	  postal_code:req.body.postal_code,
 	  street_address:req.body.street_address,
-	  reg_proof = req.file.path
+	  reg_proof:req.file.path
             }
     if (images) {
 		var myQuery = "INSERT INTO property SET ?";
