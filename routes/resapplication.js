@@ -40,5 +40,31 @@ con.query(sql,[appData],function(err,results){
 
 })
 
+// to upload proof of registration and reserve room
+router.post('/uploadReg',upload.single('reg_proof'),(req,res)=>{
+    reg_proof= req.file.path;
+    con.query("INSERT INTO reg(reg_proof) VALUES (?)",[reg_proof],function(err,result){
+     if(err) throw err;
+     
+     else
+     {
+         return res.send({result});
+     }
+    })
+});
+ 
+
+// change application status to reserved
+
+router.put('/reserve',(req,res)=>{
+    let email = (req.body.email)
+    con.query('UPDATE resapplication SET status = reserved where email = "'+email+'"',(error,results,fields)=>{
+        if(error)throw error
+        else
+        {
+            res.send({results});
+        }
+    })
+});
 
 module.exports=router;
