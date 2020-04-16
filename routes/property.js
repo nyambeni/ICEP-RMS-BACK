@@ -28,3 +28,21 @@ router.post('/addproperty',upload.single('reg_proof'),(req,res,next)=>{
     }
       res.send(file)
 })
+
+//search by campus name
+router.get('/searchProperty',function(req,res){
+
+  let campus =req.body.city
+
+  datb.query('SELECT city from property where city = "'+city+'"',function(error, results, fields) {
+      if(error) throw error;
+      else
+      {    
+          return res.send({"the results are ":results})
+      }
+       
+  }); 
+
+})
+
+module.exports = router;

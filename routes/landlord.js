@@ -231,6 +231,7 @@ router.post('/addproperty',(req,res)=>{
       prop_email : req.body.prop_email,
       property_name:req.body.property_name,
       property_owner:req.body.property_owner,
+      campus_loc:req.body.campus_loc,
       city:req.body.city,
       postal_code:req.body.postal_code,
       street_address:req.body.street_address,
@@ -271,11 +272,27 @@ router.post('/addproperty',(req,res)=>{
 
 router.get('/getgender',(req,res)=>{
 
-    var sql ="SELECT * FROM students"
+    let gender = req.body.gender;
+    con.query ="SELECT * FROM students where gender = ?",[gender],function(error,results,fields)
+    {
+        if(error)throw error
+    else{
+        res.send({results});
+    }        
 
-
+    }
 })
 
+// view all properties available
+
+router.get('/viewProperty',(req,res)=>{
+    con.query('SELECT * from property',function(error,results,fields){
+        if(error)throw error
+        else{
+            res.send({results});
+        }
+    })
+})
 module.exports = router;
 
 
