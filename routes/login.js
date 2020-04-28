@@ -69,36 +69,6 @@ router.get('/studentLogin', function(req, res) {
  });
  
 
-            //login working with session
-				router.get('/userLogin', function(req, res) {
-	
-					var email = req.body.email;
-					var password = req.body.password;
-					
-					if (email && password) {
-						var sql = "SELECT * FROM `student` WHERE email = '"+ email +"' AND pwd = '"+ password +"'";
-				    
-					con.query(sql, [email, password], function(error, results, fields) {
-					
-						if (results.length>0) {
-							res.send("successfully logged")
-						 	req.session.sesEmail = email;
-								console.log(req.session.sesEmail);
-						}
-						else{
-							res.send("user not found"),
-							    console.log(results)
-						}
-							
-						})
-						
-					} else {
-						res.send('Please enter Username and Password!');
-						response.end();
-					}
-					
-				})
-
 //logout 
 router.post('/logout', function(req,res){
 	req.session.destroy(err =>{
